@@ -1,0 +1,92 @@
+[gd_scene load_steps=5 format=3 uid="uid://mmvyp2dnkep7"]
+
+[sub_resource type="GDScript" id="GDScript_8hwf8"]
+script/source = "extends CharacterBody2D
+
+var mainScene: Node2D
+var arene: Node2D
+
+@export var vitesse_initiale: Vector2
+
+# pi/2 -> la balle peut avoir une direction verticale
+# 0 -> le balle ne peut avoir qu'une trajectoire horizontale
+
+
+
+print(angle_max)
+
+
+var max_collisions = 5	# (par frame) (balec)
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	arene = get_parent()
+	mainScene = arene.get_parent()
+	
+	velocity = vitesse_initiale
+	
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+
+func _physics_process(delta: float) -> void:
+	
+	var collision_count = 0
+	var collision = move_and_collide(velocity * delta)
+	
+	while (collision and collision_count < max_collisions):
+		var collider: Object = collision.get_collider()
+		
+		var normal: Vector2 = collision.get_normal()
+
+		
+		if collider.is_in_group(\"bloc\"):
+			collider.frapper(self)
+		elif collider.is_in_group(\"raquette\"):
+			normal = Vector2(1, 0)
+			collider.frapper(self)
+			normal += collider.velocity * collider.influence_vitesse * 10e-6
+			normal += 0 * (collision.get_position() \\
+			- collider.get_global_transform().get_origin()) * collider.influence_cotes
+			normal = normal.normalized()
+			
+			print(normal)
+			if normal.x<0.2:				
+				normal.x = 0.2
+				normal = normal.normalized()
+				print(\"new\", normal)
+			
+		var remainder = collision.get_remainder()
+		velocity = velocity.bounce(normal)
+		remainder = remainder.bounce(normal)
+		
+		collision_count += 1
+		collision = move_and_collide(remainder)
+"
+
+[sub_resource type="Gradient" id="Gradient_i3oqp"]
+offsets = PackedFloat32Array(0, 0.641791, 0.698507, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_p5gy6"]
+gradient = SubResource("Gradient_i3oqp")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bw0yr"]
+radius = 32.0
+
+[node name="Balle" type="CharacterBody2D" groups=["balle"]]
+collision_layer = 4
+collision_mask = 15
+script = SubResource("GDScript_8hwf8")
+vitesse_initiale = Vector2(-300, 0)
+angle_max = null
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_p5gy6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bw0yr")

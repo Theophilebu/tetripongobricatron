@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://burspr0mjehd8"]
+
+[ext_resource type="Script" path="res://grille_tetris.gd" id="1_3j2lk"]
+[ext_resource type="PackedScene" uid="uid://cd8jednifgjec" path="res://block.tscn" id="2_la7ki"]
+[ext_resource type="PackedScene" uid="uid://bmk7t1qeyn6kv" path="res://piece.tscn" id="3_e6jgi"]
+
+[node name="GrilleTetris" type="Area2D"]
+script = ExtResource("1_3j2lk")
+taillex = null
+tailley = null
+taille_bloc = null
+block_scene = ExtResource("2_la7ki")
+piece_scene = ExtResource("3_e6jgi")
+frequence_shift = null
+delai_tp = null
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="Timer" type="Timer" parent="."]
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

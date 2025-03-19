@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://br10mhcqdgw6b"]
+
+[ext_resource type="Script" path="res://arene.gd" id="1_w80mr"]
+
+[node name="Arene" type="Node2D"]
+script = ExtResource("1_w80mr")
+
+[node name="Interieur" type="Polygon2D" parent="."]
+color = Color(1, 1, 1, 0)
+
+[node name="MurGauche" type="StaticBody2D" parent="." groups=["mur"]]
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MurGauche"]
+polygon = PackedVector2Array(-400, -400, -400, 400, -800, 400, -800, -400)
+
+[node name="Polygon2D" type="Polygon2D" parent="MurGauche"]
+
+[node name="MurDroite" type="StaticBody2D" parent="." groups=["mur"]]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MurDroite"]
+polygon = PackedVector2Array(400, -400, 400, 400, 800, 400, 800, -400)
+
+[node name="Polygon2D" type="Polygon2D" parent="MurDroite"]
+
+[node name="MurHaut" type="StaticBody2D" parent="." groups=["mur"]]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MurHaut"]
+polygon = PackedVector2Array(-800, -324, 800, -324, 800, -400, -800, -400)
+
+[node name="Polygon2D" type="Polygon2D" parent="MurHaut"]
+
+[node name="MurBas" type="StaticBody2D" parent="." groups=["mur"]]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="MurBas"]
+polygon = PackedVector2Array(-800, 324, 800, 324, 800, 400, -800, 400)
+
+[node name="Polygon2D" type="Polygon2D" parent="MurBas"]

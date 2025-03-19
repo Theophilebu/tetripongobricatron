@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://bmk7t1qeyn6kv"]
+
+[node name="Piece" type="Area2D"]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionPolygon2D1" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="Polygon2D1" type="Polygon2D" parent="."]
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="Polygon2D2" type="Polygon2D" parent="."]
+
+[node name="CollisionPolygon2D3" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="Polygon2D3" type="Polygon2D" parent="."]
+
+[node name="CollisionPolygon2D4" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
+
+[node name="Polygon2D4" type="Polygon2D" parent="."]

@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://mmvyp2dnkep7"]
+
+[ext_resource type="Script" path="res://balle.gd" id="1_h85yr"]
+
+[sub_resource type="Gradient" id="Gradient_i3oqp"]
+offsets = PackedFloat32Array(0, 0.641791, 0.698507, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_p5gy6"]
+gradient = SubResource("Gradient_i3oqp")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bw0yr"]
+radius = 32.0
+
+[node name="Balle" type="CharacterBody2D" groups=["balle"]]
+collision_layer = 4
+collision_mask = 15
+script = ExtResource("1_h85yr")
+derivee_puissance = 0.1
+angle_max = 1.296
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_p5gy6")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bw0yr")
