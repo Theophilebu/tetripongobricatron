@@ -1,5 +1,5 @@
 extends Area2D
-# prout
+# arcaca
 
 enum TypePiece{L, L2, I, T, Carre, Ziguouiguoui1, Ziguouiguoui2}
 
@@ -38,9 +38,7 @@ var formes = {
 		Vector2i(0, 1),
 		Vector2i(0, 0),
 		Vector2i(1, 0)],
-	
 }
-
 
 @export var taillex: int = 10
 @export var tailley: int = 12
@@ -55,10 +53,6 @@ var spawn_point: Vector2i
 # shift =def la pièce se décale automatiquement vers la droite 
 @export var frequence_shift: float = 1
 var shift_timer: Timer
-
-# le temps qu'il faut laisser appuyé bas pour tp vers le bas
-@export var delai_tp: float = 1
-var tp_timer: Timer
 
 
 # Array[Array[StaticBody2D]]
@@ -122,6 +116,7 @@ func _ready() -> void:
 	get_node("CollisionPolygon2D").polygon = grille_polygon
 	
 	shift_timer = get_node("Timer")
+	shift_timer.wait_time = frequence_shift
 	shift_timer.start()
 	
 	spawn_point = Vector2i(0, tailley/2-1)
@@ -238,6 +233,16 @@ func translation_piece(translation: Vector2i):
 	position_piece_tombante += translation
 	noeud_piece_tombante.position += translation * taille_bloc
 
+func tp_piece():
+	var hauteur=0
+	while peut_translationner_piece(Vector2i(hauteur+1, 0)):
+		hauteur+=1
+	translation_piece(Vector2i(hauteur, 0))
+	if not peut_atterir_piece():
+		print("erreur bizarre help")
+	else:
+		atterir_piece()
+
 
 func peut_atterir_piece() -> bool:
 	# vérification qu'il y a un truc à droite
@@ -271,6 +276,23 @@ func atterir_piece():
 	var type_piece: TypePiece = randi_range(0, 6)
 	noeud_piece_tombante.queue_free()
 	spawn_piece(type_piece, spawn_point)
+	shift_timer.start()
+	
+	var nb_colonnes_a_detruire = nb_colonnes_completes()
+	if nb_colonnes_a_detruire == 0:
+		return
+	
+	detruire_colonnes(nb_colonnes_a_detruire)
+
+func nb_colonnes_completes() -> int:
+	for x_ in range(taillex):
+		var x = taillex - 1 - x_
+		# x commence tout à droite et finit pas trop à gauche
+		for y in range(tailley):
+			if blocks[y][x] == null:
+				return x_
+	
+	return taillex
 
 
 func creer_block(position_grille: Vector2i) -> bool:
@@ -310,16 +332,42 @@ func detruire_block(position_grille: Vector2i):
 		return
 	blocks[position_grille.y][position_grille.x] = null
 	block.queue_free()
+
+func detruire_colonnes(nb_colonnes: int):
+	""" detruit la colonne de droite, bouge le reste vers le bas """
 	
+	for y in range(tailley):
+		for x in range(taillex-nb_colonnes, taillex):
+			detruire_block(Vector2i(x, y))
+	
+	
+	# gravité horizontale
+	for y in range(tailley):
+		for x_ in range(nb_colonnes, taillex):
+			var x = taillex - x_
+			# x commence tout à droite et finit pas trop à gauche
+			blocks[y][x] = blocks[y][x-nb_colonnes]
+			if blocks[y][x]!=null:
+				blocks[y][x].position.x += nb_colonnes * taille_bloc
+				blocks[y][x].coos = Vector2i(x, y)
+
+
+
 
 func _process(delta: float) -> void:
 	pass
 
 
 func _on_timer_timeout() -> void:
-	pass
-	# print("timeout")
-	# translation_piece(Vector2i(1, 0))
+	print("timeout")
+	
+	if peut_translationner_piece(Vector2i(1, 0)):
+		translation_piece(Vector2i(1, 0))
+	elif peut_atterir_piece():
+		atterir_piece()
+	else:
+		print("grosse erreur, on peut pas bouger 
+		mais pas atterir non plus: wtf")
 
 
 
@@ -328,7 +376,8 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("PieceDown") or\
 	event.is_action_pressed("PieceUp") or\
 	event.is_action_pressed("PieceLeft") or\
-	event.is_action_pressed("PieceRight"):
+	event.is_action_pressed("PieceRight") or\
+	event.is_action_pressed("PieceTp"):
 		mouvement_input(event)
 	
 	if event.is_action_pressed("PieceTournerTrigo") or\
@@ -336,11 +385,18 @@ func _input(event: InputEvent) -> void:
 		rotation_input(event)
 	
 	
-		
-		
-		
+	if event.is_action_pressed("debug1"):
+		print("detruire_colonnes")
+		detruire_colonnes(1)
+
+
 func mouvement_input(event: InputEvent) -> void:
 	var translation: Vector2i = Vector2i(0, 0)
+	
+	if event.is_action_pressed("PieceTp"):
+		tp_piece()
+		return
+	
 	if event.is_action_pressed("PieceRight"):
 		if peut_atterir_piece():
 			atterir_piece()
@@ -358,6 +414,7 @@ func mouvement_input(event: InputEvent) -> void:
 	if peut_translationner_piece(translation):
 		translation_piece(translation)
 		return
+
 
 func rotation_input(event: InputEvent) -> void:
 	var sens_trigo: bool

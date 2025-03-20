@@ -18,8 +18,3 @@ angle_max = 1.092
 marge_x = 30.0
 
 [node name="GrilleTetris" parent="Arene" instance=ExtResource("4_rdmvb")]
-taillex = 10
-tailley = 12
-taille_bloc = 50.0
-frequence_shift = 1.0
-delai_tp = 1.0

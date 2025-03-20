@@ -6,13 +6,8 @@
 
 [node name="GrilleTetris" type="Area2D"]
 script = ExtResource("1_3j2lk")
-taillex = null
-tailley = null
-taille_bloc = null
 block_scene = ExtResource("2_la7ki")
 piece_scene = ExtResource("3_e6jgi")
-frequence_shift = null
-delai_tp = null
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(0, 0, 0, 0, 0, 0)
