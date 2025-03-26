@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://idwyv3ldvngk"]
+[gd_scene load_steps=4 format=3 uid="uid://idwyv3ldvngk"]
 
 [ext_resource type="PackedScene" uid="uid://br10mhcqdgw6b" path="res://arene.tscn" id="1_5in8p"]
-[ext_resource type="PackedScene" uid="uid://be45qbfxq5ypo" path="res://raquette.tscn" id="1_ip2lf"]
 [ext_resource type="PackedScene" uid="uid://mmvyp2dnkep7" path="res://balle.tscn" id="2_apci1"]
 [ext_resource type="PackedScene" uid="uid://burspr0mjehd8" path="res://grille_tetris.tscn" id="4_rdmvb"]
 
@@ -13,8 +12,5 @@ position = Vector2(576, 324)
 [node name="Balle" parent="Arene" instance=ExtResource("2_apci1")]
 vitesse_initiale = Vector2(-500, 0)
 angle_max = 1.092
-
-[node name="Raquette" parent="Arene" groups=["raquette"] instance=ExtResource("1_ip2lf")]
-marge_x = 30.0
 
 [node name="GrilleTetris" parent="Arene" instance=ExtResource("4_rdmvb")]
