@@ -104,13 +104,13 @@ func _ready() -> void:
 	
 	# ecart à réduire pour que les pièces se
 	# collent bien sur le mur
-	var ecart_droit: float = (arene.taillex - taillex*taille_bloc)/2
+	var ecart_bas: float = (arene.tailley - tailley*taille_bloc)/2
 	
 	grille_polygon = [
-		Vector2(ecart_droit-taillex*taille_bloc/2, -tailley*taille_bloc/2),
-		Vector2(ecart_droit-taillex*taille_bloc/2, tailley*taille_bloc/2),
-		Vector2(ecart_droit+taillex*taille_bloc/2, tailley*taille_bloc/2),
-		Vector2(ecart_droit+taillex*taille_bloc/2, -tailley*taille_bloc/2),
+		Vector2(-taillex*taille_bloc/2, ecart_bas-tailley*taille_bloc/2),
+		Vector2(-taillex*taille_bloc/2, ecart_bas+tailley*taille_bloc/2),
+		Vector2(taillex*taille_bloc/2, ecart_bas+tailley*taille_bloc/2),
+		Vector2(taillex*taille_bloc/2, ecart_bas-tailley*taille_bloc/2),
 	]
 	
 	get_node("CollisionPolygon2D").polygon = grille_polygon
@@ -119,7 +119,7 @@ func _ready() -> void:
 	shift_timer.wait_time = frequence_shift
 	shift_timer.start()
 	
-	spawn_point = Vector2i(0, tailley/2-1)
+	spawn_point = Vector2i(taillex/2-1, 0)
 	var type_piece: TypePiece = randi_range(0, 6)
 	spawn_piece(type_piece, spawn_point)
 
@@ -235,38 +235,38 @@ func translation_piece(translation: Vector2i):
 
 func tp_piece():
 	var hauteur=0
-	while peut_translationner_piece(Vector2i(hauteur+1, 0)):
+	while peut_translationner_piece(Vector2i(0, hauteur+1)):
 		hauteur+=1
-	translation_piece(Vector2i(hauteur, 0))
+	translation_piece(Vector2i(0, hauteur))
 	if not peut_atterir_piece():
 		print("erreur bizarre help")
 	else:
 		atterir_piece()
 
-
 func peut_atterir_piece() -> bool:
 	# vérification qu'il y a un truc à droite
 	# et pas trop de bordel
 	
-	var truc_a_droite = false
+	var truc_en_bas = false
 	
 	for coo_relative_block in forme_piece_tombante:
 		var coo_block = coo_relative_block+position_piece_tombante
 		
 		# la pièce doit être dans la grille
-		if coo_block.x<0 or coo_block.x>=taillex:
-			return false
-		
 		if coo_block.y<0 or coo_block.y>=tailley:
 			return false
 		
-		if coo_block.x == taillex - 1:
-			truc_a_droite = true
+		if coo_block.x<0 or coo_block.x>=taillex:
+			return false
 		
-		elif blocks[coo_block.y][coo_block.x + 1] != null:
-			truc_a_droite = true
+		if coo_block.y == tailley - 1:
+			truc_en_bas = true
+		
+		elif blocks[coo_block.y + 1][coo_block.x] != null:
+			truc_en_bas = true
 	
-	return truc_a_droite
+	return truc_en_bas
+
 
 func atterir_piece():
 	for coo_relative_block in forme_piece_tombante:
@@ -278,21 +278,21 @@ func atterir_piece():
 	spawn_piece(type_piece, spawn_point)
 	shift_timer.start()
 	
-	var nb_colonnes_a_detruire = nb_colonnes_completes()
+	var nb_colonnes_a_detruire = nb_lignes_completes()
 	if nb_colonnes_a_detruire == 0:
 		return
 	
-	detruire_colonnes(nb_colonnes_a_detruire)
+	detruire_lignes(nb_colonnes_a_detruire)
 
-func nb_colonnes_completes() -> int:
-	for x_ in range(taillex):
-		var x = taillex - 1 - x_
-		# x commence tout à droite et finit pas trop à gauche
-		for y in range(tailley):
+func nb_lignes_completes() -> int:
+	for y_ in range(tailley):
+		var y = tailley - 1 - y_
+		# y commence tout en haut et finit pas trop en hau
+		for x in range(taillex):
 			if blocks[y][x] == null:
-				return x_
+				return y_
 	
-	return taillex
+	return tailley
 
 
 func creer_block(position_grille: Vector2i) -> bool:
@@ -351,6 +351,23 @@ func detruire_colonnes(nb_colonnes: int):
 				blocks[y][x].position.x += nb_colonnes * taille_bloc
 				blocks[y][x].coos = Vector2i(x, y)
 
+func detruire_lignes(nb_lignes: int):
+	""" detruit la ligne de bas, bouge le reste vers le bas """
+	
+	for y in range(tailley-nb_lignes, tailley):
+		for x in range(taillex):
+			detruire_block(Vector2i(x, y))
+	
+	
+	# gravité verticale
+	for y_ in range(nb_lignes, tailley):
+		for x in range(taillex):
+			var y = tailley - y_
+			# x commence tout à droite et finit pas trop à gauche
+			blocks[y][x] = blocks[y-nb_lignes][x]
+			if blocks[y][x]!=null:
+				blocks[y][x].position.y += nb_lignes * taille_bloc
+				blocks[y][x].coos = Vector2i(x, y)
 
 
 
@@ -361,8 +378,8 @@ func _process(delta: float) -> void:
 func _on_timer_timeout() -> void:
 	print("timeout")
 	
-	if peut_translationner_piece(Vector2i(1, 0)):
-		translation_piece(Vector2i(1, 0))
+	if peut_translationner_piece(Vector2i(0, 1)):
+		translation_piece(Vector2i(0, 1))
 	elif peut_atterir_piece():
 		atterir_piece()
 	else:
@@ -387,7 +404,7 @@ func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("debug1"):
 		print("detruire_colonnes")
-		detruire_colonnes(1)
+		detruire_lignes(1)
 
 
 func mouvement_input(event: InputEvent) -> void:
