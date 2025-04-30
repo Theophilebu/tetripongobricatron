@@ -122,4 +122,5 @@ func frapper_mur_droite():
 
 
 func mort():
-	print("mort")
+	pass
+	# print("mort")

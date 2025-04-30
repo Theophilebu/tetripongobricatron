@@ -1,8 +1,12 @@
 extends Node2D
 
-@export var taillex: float = 800
-@export var tailley: float = 600
+@export var nbr_blocks_x: int = 10
+@export var nbr_blocks_y: int = 12
 
+@export var taille_block: float = 50
+
+var taillex: float = nbr_blocks_x * taille_block
+var tailley: float = nbr_blocks_y * taille_block
 
 var interieur: Polygon2D
 

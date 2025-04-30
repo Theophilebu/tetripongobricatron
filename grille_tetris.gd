@@ -40,10 +40,10 @@ var formes = {
 		Vector2i(1, 0)],
 }
 
-@export var taillex: int = 10
-@export var tailley: int = 12
+var taillex: int = 10
+var tailley: int = 12
 
-@export var taille_bloc: float = 50
+var taille_bloc: float = 50
 
 @export var block_scene: PackedScene
 @export var piece_scene: PackedScene
@@ -101,6 +101,10 @@ func _ready() -> void:
 		blocks.append(ligne)
 	
 	arene = get_parent()
+	
+	taillex = arene.nbr_blocks_x
+	tailley = arene.nbr_blocks_y
+	taille_bloc = arene.taille_block
 	
 	# ecart à réduire pour que les pièces se
 	# collent bien sur le mur
@@ -284,6 +288,7 @@ func atterir_piece():
 	
 	detruire_lignes(nb_colonnes_a_detruire)
 
+# c'est de la merde
 func nb_lignes_completes() -> int:
 	for y_ in range(tailley):
 		var y = tailley - 1 - y_
@@ -293,6 +298,21 @@ func nb_lignes_completes() -> int:
 				return y_
 	
 	return tailley
+
+func lignes_completes() -> Array[int]:
+	var lignes = []
+	for y_ in range(tailley):
+		var y = tailley - 1 - y_
+		var ligne_complete = true
+		# y commence tout en haut et finit pas trop en hau
+		for x in range(taillex):
+			if blocks[y][x] == null:
+				ligne_complete = false
+				break
+		if ligne_complete:
+			lignes.append(y)
+		
+	return lignes
 
 
 func creer_block(position_grille: Vector2i) -> bool:
@@ -333,6 +353,7 @@ func detruire_block(position_grille: Vector2i):
 	blocks[position_grille.y][position_grille.x] = null
 	block.queue_free()
 
+# c'est dla merde
 func detruire_colonnes(nb_colonnes: int):
 	""" detruit la colonne de droite, bouge le reste vers le bas """
 	
@@ -351,6 +372,7 @@ func detruire_colonnes(nb_colonnes: int):
 				blocks[y][x].position.x += nb_colonnes * taille_bloc
 				blocks[y][x].coos = Vector2i(x, y)
 
+# c'est dla merde
 func detruire_lignes(nb_lignes: int):
 	""" detruit la ligne de bas, bouge le reste vers le bas """
 	
@@ -376,7 +398,7 @@ func _process(delta: float) -> void:
 
 
 func _on_timer_timeout() -> void:
-	print("timeout")
+	# print("timeout")
 	
 	if peut_translationner_piece(Vector2i(0, 1)):
 		translation_piece(Vector2i(0, 1))
@@ -414,18 +436,18 @@ func mouvement_input(event: InputEvent) -> void:
 		tp_piece()
 		return
 	
-	if event.is_action_pressed("PieceRight"):
+	if event.is_action_pressed("PieceDown"):
 		if peut_atterir_piece():
 			atterir_piece()
 			return
-		translation = Vector2i(1, 0)
+		translation = Vector2i(0, 1)
 			
 	elif event.is_action_pressed("PieceLeft"):
 		translation = Vector2i(-1, 0)
 	elif event.is_action_pressed("PieceUp"):
 		translation = Vector2i(0, -1)
-	elif event.is_action_pressed("PieceDown"):
-		translation = Vector2i(0, 1)
+	elif event.is_action_pressed("PieceRight"):
+		translation = Vector2i(1, 0)
 	
 	
 	if peut_translationner_piece(translation):
